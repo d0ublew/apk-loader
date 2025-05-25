@@ -65,17 +65,18 @@ public class Main {
             assert dexPathList != null;
             ArrayList<File> newNativeLibs = new ArrayList<>();
             newNativeLibs.add(new File(apkLoaderLibsDir));
-            Field nativeLibsField = DReflection.findField(dexPathList, "nativeLibraryDirectories");
-            ArrayList<File> nativeLibsList = (ArrayList<File>) nativeLibsField.get(dexPathList);
-            if (nativeLibsList == null) {
-                nativeLibsField.set(dexPathList, newNativeLibs);
+            Field oriNativeLibsField = DReflection.findField(dexPathList, "nativeLibraryDirectories");
+            ArrayList<File> oriNativeLibsList = (ArrayList<File>) oriNativeLibsField.get(dexPathList);
+            if (oriNativeLibsList == null) {
+                oriNativeLibsField.set(dexPathList, newNativeLibs);
             } else {
-                nativeLibsList.addAll(newNativeLibs);
+                oriNativeLibsList.addAll(newNativeLibs);
             }
 
             Method makePathElementsNativeMethod = DReflection.findMethod(dexPathList, "makePathElements", List.class);
             makePathElementsNativeMethod.setAccessible(true);
             Object[] nativeLibsArr = (Object[]) makePathElementsNativeMethod.invoke(dexPathList, newNativeLibs);
+            assert nativeLibsArr != null;
             DReflection.expandFieldArray(dexPathList, "nativeLibraryPathElements", nativeLibsArr);
 
             ArrayList<File> newDexPathList = new ArrayList<>();
@@ -83,6 +84,7 @@ public class Main {
             Method makePathElementsMethod = DReflection.findMethod(dexPathList, "makePathElements", List.class, File.class, List.class);
             makePathElementsMethod.setAccessible(true);
             Object[] dexArr = (Object[]) makePathElementsMethod.invoke(dexPathList, newDexPathList, null, null);
+            assert dexArr != null;
             DReflection.expandFieldArray(dexPathList, "dexElements", dexArr);
 
 //            Method findLibraryMethod = DReflection.findMethod(apkClassLoader, "findLibrary", String.class);
