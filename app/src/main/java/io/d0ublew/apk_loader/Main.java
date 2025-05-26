@@ -8,6 +8,7 @@ import io.d0ublew.apk_loader.util.DReflection;
 import android.content.Context;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,12 +21,11 @@ public class Main {
     public static String tobeLoadedApk;
 
     public static String entryClass;
-    public static String entryPoint;
 
     public static Context appContext;
 
-    public static void init(String apk, String clazz, String method) {
-        DLog.i(TAG, "entrypoint init() called");
+    public Main(String apk, String clazz) {
+        DLog.i(TAG, "constructor called");
         Context context = App.createAppContext();
         if (context == null) {
             DLog.e(TAG, "createAppContext() failed");
@@ -34,10 +34,8 @@ public class Main {
         appContext = context;
         tobeLoadedApk = apk;
         entryClass = clazz;
-        entryPoint = method;
         DLog.i(TAG, "tobeLoadedApk: " + tobeLoadedApk);
         DLog.i(TAG, "entryClass: " + entryClass);
-        DLog.i(TAG, "entryPoint: " + entryPoint);
         init(context);
     }
 
@@ -100,10 +98,10 @@ public class Main {
 
         try {
             Class<?> clazz = apkClassLoader.loadClass(entryClass);
-            Method method = clazz.getMethod(entryPoint);
-            method.invoke(null);
+            Constructor<?> ctor = clazz.getConstructor(Context.class);
+            ctor.newInstance(context);
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
-                 InvocationTargetException e) {
+                 InvocationTargetException | InstantiationException e) {
             DLog.e(TAG, "Failed to load dynamic stuff: " + e);
             return;
         }
