@@ -91,7 +91,7 @@ public class Main {
 //            DLog.i(TAG, "findLibrary(): " + out);
         } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException |
                  InvocationTargetException e) {
-            DLog.e(TAG, "Failed to modify original classLoader: " + e);
+            DLog.e(TAG, "Failed to modify original classLoader: ", e);
             return;
         }
         DLog.i(TAG, "After apkClassLoader: " + apkClassLoader);
@@ -102,7 +102,7 @@ public class Main {
             ctor.newInstance(context);
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
                  InvocationTargetException | InstantiationException e) {
-            DLog.e(TAG, "Failed to load dynamic stuff: " + e);
+            DLog.e(TAG, "Failed to load dynamic stuff: ", e);
             return;
         }
     }
